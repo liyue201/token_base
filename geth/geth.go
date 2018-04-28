@@ -7,7 +7,6 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
-	"github.com/Marker451/token_base/erc20token"
 	"github.com/ethereum/go-ethereum"
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
@@ -17,6 +16,7 @@ import (
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethclient"
+	"github.com/liyue201/token_base/erc20token"
 	"math/big"
 	"strings"
 )
@@ -95,7 +95,6 @@ func (this *TokenClient) ETHBalanceOf(addr string) (balance *big.Int, err error)
 	}
 	return this.client.BalanceAt(context.Background(), common.HexToAddress(addr), nil)
 }
-
 
 func (this *TokenClient) invalidAddress(addr string) bool {
 	return common.HexToAddress(addr) == common.HexToAddress("some worng data will return 0 address")
@@ -243,6 +242,7 @@ func (this *TokenClient) GetTransferLogByFromAddr(fromBlockNum *big.Int, toBlock
 	}
 	return this.getEventLos(fromBlockNum, toBlockNum, query)
 }
+
 func (this *TokenClient) GetTransferLogByToAddr(fromBlockNum *big.Int, toBlockNum *big.Int, to string) (logs []types.Log, err error) {
 	eventID, err := this.getEventID("Transfer")
 	if err != nil {
@@ -256,6 +256,7 @@ func (this *TokenClient) GetTransferLogByToAddr(fromBlockNum *big.Int, toBlockNu
 	}
 	return this.getEventLos(fromBlockNum, toBlockNum, query)
 }
+
 func (this *TokenClient) getEventLos(fromBlockNum *big.Int, toBlockNum *big.Int, query ethereum.FilterQuery) (logs []types.Log, err error) {
 	return this.client.FilterLogs(context.Background(), query)
 
