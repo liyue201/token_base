@@ -52,9 +52,7 @@ func ImprotPrivateKey(pvk string, pwd string) (keyjson []byte, err error) {
 	}
 	return ks.Export(account, "", "")
 }
-func NewEthClient(nodeAddr string) (cli *ethclient.Client, err error) {
-	return ethclient.Dial(nodeAddr)
-}
+
 func NewTokenClient(token erc20token.Erc20token, nodeAddr string) (cli *TokenClient, err error) {
 	c, err := ethclient.Dial(nodeAddr)
 	if err != nil {
@@ -80,6 +78,10 @@ func (this *TokenClient) NewAccout(pwd string, storeDir string) (keyjson []byte,
 	return ks.Export(account, pwd, pwd)
 }
 
+func (this *TokenClient) TotalSupply() (balance *big.Int, err error) {
+	return this.token.TotalSupply(nil)
+}
+
 func (this *TokenClient) BalanceOfToken(addr string) (balance *big.Int, err error) {
 	if this.invalidAddress(addr) {
 		return nil, invalidAddrErr
@@ -93,6 +95,7 @@ func (this *TokenClient) ETHBalanceOf(addr string) (balance *big.Int, err error)
 	}
 	return this.client.BalanceAt(context.Background(), common.HexToAddress(addr), nil)
 }
+
 
 func (this *TokenClient) invalidAddress(addr string) bool {
 	return common.HexToAddress(addr) == common.HexToAddress("some worng data will return 0 address")
@@ -177,6 +180,7 @@ func (this *TokenClient) GetTransferLog(fromBlockNum *big.Int, toBlockNum *big.I
 	}
 	return this.getEventLos(fromBlockNum, toBlockNum, query)
 }
+
 func (this *TokenClient) GetAllTransferLogByAddress(fromBlockNum *big.Int, toBlockNum *big.Int, addr string) (logs []types.Log, err error) {
 	fromLog, err := this.GetTransferLogByFromAddr(fromBlockNum, toBlockNum, addr)
 	if err != nil {
@@ -282,6 +286,5 @@ func ConvertTransferLog(log types.Log) (lg *TransferLog, err error) {
 	lg.To = "0x" + hex.EncodeToString(math.MustParseBig256(log.Topics[2].String()).Bytes())
 	lg.Val = math.MustParseBig256("0x" + hex.EncodeToString(log.Data))
 	lg.TxHash = log.TxHash.String()
-	fmt.Println(lg.From, lg.To, log.BlockNumber, log.TxIndex)
 	return
 }
